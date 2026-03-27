@@ -29,7 +29,6 @@
             android:layout_marginTop="8dp"
             android:paddingBottom="4dp">
             <TextView android:layout_width="40dp" android:layout_height="wrap_content" android:text="Sæt" android:textStyle="bold" android:gravity="center"/>
-            <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Tidligere" android:textStyle="bold" android:gravity="center"/>
             <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="kg" android:textStyle="bold" android:gravity="center"/>
             <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Reps" android:textStyle="bold" android:gravity="center"/>
         </LinearLayout>

@@ -165,40 +165,38 @@ public class WorkoutSessionActivity extends AppCompatActivity {
                 setsContainer.removeAllViews();
                 setCounter = 0;
 
-                repository.getLastSetsForExercise(exercise.id, lastSets -> {
-                    runOnUiThread(() -> {
-                        if (lastSets != null && !lastSets.isEmpty()) {
-                            for (ExerciseSet lastSet : lastSets) {
-                                String prev;
-                                if ("DISTANCE_TIME".equals(exercise.type)) {
-                                    prev = formatDistanceTime(lastSet.weight, lastSet.reps);
-                                } else {
-                                    prev = lastSet.weight + "kg x " + lastSet.reps;
-                                }
-                                addSetRow(exercise, prev);
-                            }
+                // Update headers based on type
+                View header = ((ViewGroup) itemView).getChildAt(0);
+                if (header instanceof LinearLayout) {
+                    LinearLayout inner = (LinearLayout) header;
+                    View headersRow = inner.getChildAt(1);
+                    if (headersRow instanceof LinearLayout) {
+                        LinearLayout hRow = (LinearLayout) headersRow;
+                        TextView tvWeightLabel = (TextView) hRow.getChildAt(1); // Index 1 is weight/km (Previous column removed from UI)
+                        TextView tvRepsLabel = (TextView) hRow.getChildAt(2);   // Index 2 is reps/time
+                        if ("DISTANCE_TIME".equals(exercise.type)) {
+                            tvWeightLabel.setText("km");
+                            tvRepsLabel.setText("Tid");
                         } else {
-                            addSetRow(exercise, "-");
+                            tvWeightLabel.setText("kg");
+                            tvRepsLabel.setText("Reps");
                         }
-                    });
-                });
+                    }
+                }
 
-                btnAddSet.setOnClickListener(v -> addSetRow(exercise, "-"));
+                addSetRow(exercise);
+
+                btnAddSet.setOnClickListener(v -> addSetRow(exercise));
             }
 
-            private String formatDistanceTime(double km, int totalSeconds) {
-                int h = totalSeconds / 3600;
-                int m = (totalSeconds % 3600) / 60;
-                int s = totalSeconds % 60;
-                return String.format(Locale.getDefault(), "%.1f km / %02d:%02d:%02d", km, h, m, s);
-            }
-
-            private void addSetRow(Exercise exercise, String previousText) {
+            private void addSetRow(Exercise exercise) {
                 setCounter++;
                 View row = LayoutInflater.from(WorkoutSessionActivity.this).inflate(R.layout.item_set_row, setsContainer, false);
                 TextView tvSetNum = row.findViewById(R.id.tvSetNumber);
                 tvSetNum.setText(String.valueOf(setCounter));
-                ((TextView) row.findViewById(R.id.tvPrevious)).setText(previousText);
+                
+                // Hide Previous column
+                row.findViewById(R.id.tvPrevious).setVisibility(View.GONE);
                 
                 EditText etWeight = row.findViewById(R.id.etWeight);
                 EditText etReps = row.findViewById(R.id.etReps);
