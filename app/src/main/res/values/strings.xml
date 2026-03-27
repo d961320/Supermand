@@ -1,0 +1,33 @@
+<resources>
+    <string name="app_name">Supermand</string>
+    <string name="title_main">Supermand Training</string>
+    <string name="btn_quick_start">Hurtig start (Tom session)</string>
+    <string name="btn_stats">Statistik</string>
+    <string name="btn_calendar">Kalender</string>
+    <string name="header_quick_log">Hurtig Log (Enkelt øvelse)</string>
+    <string name="btn_log_exercise">Log øvelse</string>
+    <string name="today">I dag</string>
+    <string name="header_templates">Dine Programmer</string>
+    <string name="btn_manage_exercises">Administrer øvelser</string>
+
+    <string name="stats_title">Træningsstatistik</string>
+    <string name="week">Uge</string>
+    <string name="month">Måned</string>
+    <string name="year">År</string>
+    <string name="overall_activity">Samlet aktivitet</string>
+    <string name="exercise_progress">Øvelsesfremgang</string>
+
+    <string name="cal_title_prefix">Træninger d. </string>
+    <string name="btn_log_on_date">Registrer træning på denne dato</string>
+    <string name="dialog_choose_program">Vælg program for denne dag</string>
+    <string name="empty_session">Tom session (Hurtig start)</string>
+    <string name="manual_log">Manuel log</string>
+
+    <string name="weight">Vægt</string>
+    <string name="volume">Volumen</string>
+    <string name="reps">Gentagelser</string>
+    <string name="save">Gem</string>
+    <string name="cancel">Annuller</string>
+    <string name="new_exercise">Ny øvelse</string>
+    <string name="language">Sprog</string>
+</resources>

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginVertical="8dp"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="2dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="12dp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/tvExerciseName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:text="Øvelse Navn"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <com.google.android.material.button.MaterialButtonToggleGroup
+                android:id="@+id/toggleChartType"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                app:checkedButton="@+id/btnLine"
+                app:singleSelection="true">
+
+                <Button
+                    android:id="@+id/btnLine"
+                    style="?attr/materialButtonOutlinedStyle"
+                    android:layout_width="48dp"
+                    android:layout_height="36dp"
+                    android:padding="0dp"
+                    android:text="📈" />
+
+                <Button
+                    android:id="@+id/btnBar"
+                    style="?attr/materialButtonOutlinedStyle"
+                    android:layout_width="48dp"
+                    android:layout_height="36dp"
+                    android:padding="0dp"
+                    android:text="📊" />
+            </com.google.android.material.button.MaterialButtonToggleGroup>
+        </RelativeLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_marginTop="8dp">
+
+            <com.github.mikephil.charting.charts.LineChart
+                android:id="@+id/exerciseLineChart"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <com.github.mikephil.charting.charts.BarChart
+                android:id="@+id/exerciseBarChart"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone" />
+        </FrameLayout>
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

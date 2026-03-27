@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingVertical="4dp">
+
+    <TextView
+        android:id="@+id/tvSetNumber"
+        android:layout_width="40dp"
+        android:layout_height="wrap_content"
+        android:text="1"
+        android:gravity="center"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/tvPrevious"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="-"
+        android:gravity="center"
+        android:textColor="@android:color/darker_gray" />
+
+    <!-- Weight/Distance Input -->
+    <EditText
+        android:id="@+id/etWeight"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:hint="kg"
+        android:gravity="center"
+        android:inputType="numberDecimal"
+        android:background="@android:drawable/editbox_background_normal"
+        android:padding="8dp" />
+
+    <!-- Reps Input (Hidden for Distance/Time) -->
+    <EditText
+        android:id="@+id/etReps"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:hint="0"
+        android:gravity="center"
+        android:inputType="number"
+        android:background="@android:drawable/editbox_background_normal"
+        android:padding="8dp" />
+
+    <!-- Time Inputs (Hidden for Weight) -->
+    <LinearLayout
+        android:id="@+id/llTimeInputs"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="2.5"
+        android:orientation="horizontal"
+        android:visibility="gone">
+
+        <EditText
+            android:id="@+id/etHours"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="t"
+            android:gravity="center"
+            android:inputType="number"
+            android:background="@android:drawable/editbox_background_normal" />
+        <EditText
+            android:id="@+id/etMinutes"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="m"
+            android:gravity="center"
+            android:inputType="number"
+            android:background="@android:drawable/editbox_background_normal" />
+        <EditText
+            android:id="@+id/etSeconds"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="s"
+            android:gravity="center"
+            android:inputType="number"
+            android:background="@android:drawable/editbox_background_normal" />
+    </LinearLayout>
+
+    <ImageButton
+        android:id="@+id/btnDeleteSet"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:src="@android:drawable/ic_menu_delete"
+        android:contentDescription="Delete set"
+        android:tint="@android:color/holo_red_dark" />
+
+</LinearLayout>
