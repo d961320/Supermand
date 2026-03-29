@@ -37,6 +37,7 @@ public class ManageExercisesActivity extends AppCompatActivity {
         adapter.setOnExerciseClickListener(exercise -> {
             List<String> optionsList = new ArrayList<>(Arrays.asList(
                     getString(R.string.btn_stats), 
+                    "Rediger øvelse",
                     "Start træning (kun denne øvelse)"
             ));
             
@@ -55,6 +56,8 @@ public class ManageExercisesActivity extends AppCompatActivity {
                             intent.putExtra("EXERCISE_ID", exercise.id);
                             intent.putExtra("EXERCISE_NAME", exercise.name);
                             startActivity(intent);
+                        } else if (selectedOption.equals("Rediger øvelse")) {
+                            showEditExerciseDialog(exercise);
                         } else if (selectedOption.equals("Slet øvelse")) {
                             confirmDeleteExercise(exercise);
                         } else {
@@ -108,6 +111,34 @@ public class ManageExercisesActivity extends AppCompatActivity {
                     if (!name.isEmpty()) {
                         String type = (rgType.getCheckedRadioButtonId() == R.id.rbDistanceTime) ? "DISTANCE_TIME" : "WEIGHT";
                         repository.insertExercise(new Exercise(name, true, type));
+                        loadExercises();
+                    }
+                })
+                .setNegativeButton(R.string.cancel, null)
+                .show();
+    }
+
+    private void showEditExerciseDialog(Exercise exercise) {
+        View view = LayoutInflater.from(this).inflate(R.layout.dialog_add_exercise, null);
+        EditText input = view.findViewById(R.id.etExerciseName);
+        RadioGroup rgType = view.findViewById(R.id.rgExerciseType);
+
+        input.setText(exercise.name);
+        if ("DISTANCE_TIME".equals(exercise.type)) {
+            rgType.check(R.id.rbDistanceTime);
+        } else {
+            rgType.check(R.id.rbWeight);
+        }
+
+        new AlertDialog.Builder(this)
+                .setTitle("Rediger øvelse")
+                .setView(view)
+                .setPositiveButton(R.string.save, (dialog, which) -> {
+                    String name = input.getText().toString().trim();
+                    if (!name.isEmpty()) {
+                        exercise.name = name;
+                        exercise.type = (rgType.getCheckedRadioButtonId() == R.id.rbDistanceTime) ? "DISTANCE_TIME" : "WEIGHT";
+                        repository.updateExercise(exercise);
                         loadExercises();
                     }
                 })

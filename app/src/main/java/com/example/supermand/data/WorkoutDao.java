@@ -14,6 +14,9 @@ public interface WorkoutDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     long insertExercise(Exercise exercise);
 
+    @Update
+    void updateExercise(Exercise exercise);
+
     @Query("SELECT * FROM exercises WHERE name = :name LIMIT 1")
     Exercise getExerciseByName(String name);
 

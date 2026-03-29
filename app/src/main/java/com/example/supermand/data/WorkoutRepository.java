@@ -74,6 +74,10 @@ public class WorkoutRepository {
         executor.execute(() -> workoutDao.insertExercise(exercise));
     }
 
+    public void updateExercise(Exercise exercise) {
+        executor.execute(() -> workoutDao.updateExercise(exercise));
+    }
+
     public void deleteExercise(Exercise exercise) {
         executor.execute(() -> workoutDao.deleteExercise(exercise));
     }
