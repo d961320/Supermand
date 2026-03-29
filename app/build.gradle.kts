@@ -41,6 +41,7 @@ dependencies {
     implementation(libs.room.guava)
 
     implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
+    implementation(libs.material.calendar.view)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)

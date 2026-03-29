@@ -8,6 +8,7 @@ appcompat = "1.7.1"
 material = "1.13.0"
 constraintlayout = "2.2.0"
 room = "2.6.1"
+material-calendar-view = "1.9.2"
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -19,6 +20,7 @@ constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayo
 room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
 room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 room-guava = { group = "androidx.room", name = "room-guava", version.ref = "room" }
+material-calendar-view = { group = "com.applandeo", name = "material-calendar-view", version.ref = "material-calendar-view" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

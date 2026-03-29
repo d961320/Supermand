@@ -63,6 +63,13 @@ public class WorkoutRepository {
         });
     }
 
+    public void getAllSessions(RepositoryCallback<List<WorkoutSession>> callback) {
+        executor.execute(() -> {
+            List<WorkoutSession> sessions = workoutDao.getAllSessions();
+            callback.onComplete(sessions);
+        });
+    }
+
     public void getExerciseProgress(int exerciseId, RepositoryCallback<List<ExerciseProgress>> callback) {
         executor.execute(() -> {
             List<ExerciseProgress> progress = workoutDao.getExerciseProgress(exerciseId);

@@ -3,12 +3,13 @@ package com.example.supermand;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
-import android.widget.CalendarView;
 import android.widget.TextView;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import com.applandeo.materialcalendarview.CalendarView;
+import com.applandeo.materialcalendarview.EventDay;
 import com.example.supermand.data.WorkoutRepository;
 import com.example.supermand.data.WorkoutSession;
 import com.example.supermand.data.WorkoutTemplate;
@@ -25,6 +26,7 @@ public class CalendarActivity extends AppCompatActivity {
     private SimpleDateFormat dateFormat = new SimpleDateFormat("dd. MMMM yyyy", Locale.getDefault());
     private TextView tvSelectedDate;
     private List<WorkoutTemplate> availableTemplates = new ArrayList<>();
+    private CalendarView calendarView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,7 +34,7 @@ public class CalendarActivity extends AppCompatActivity {
         setContentView(R.layout.activity_calendar);
 
         repository = new WorkoutRepository(getApplication());
-        CalendarView calendarView = findViewById(R.id.calendarView);
+        calendarView = findViewById(R.id.calendarView);
         tvSelectedDate = findViewById(R.id.tvSelectedDate);
         RecyclerView rvPastSessions = findViewById(R.id.rvPastSessions);
         Button btnLogWorkout = findViewById(R.id.btnLogWorkoutOnDate);
@@ -41,14 +43,12 @@ public class CalendarActivity extends AppCompatActivity {
         adapter = new SessionSummaryAdapter();
         rvPastSessions.setAdapter(adapter);
 
-        selectedDateMillis = calendarView.getDate();
+        selectedDateMillis = System.currentTimeMillis();
         updateSelectedDateText();
 
-        calendarView.setOnDateChangeListener((view, year, month, dayOfMonth) -> {
-            Calendar cal = Calendar.getInstance();
-            cal.set(year, month, dayOfMonth, 0, 0, 0);
-            cal.set(Calendar.MILLISECOND, 0);
-            selectedDateMillis = cal.getTimeInMillis();
+        calendarView.setOnDayClickListener(eventDay -> {
+            Calendar clickedDay = eventDay.getCalendar();
+            selectedDateMillis = clickedDay.getTimeInMillis();
             updateSelectedDateText();
             loadSessionsForDate();
         });
@@ -57,6 +57,19 @@ public class CalendarActivity extends AppCompatActivity {
 
         loadSessionsForDate();
         loadTemplates();
+        highlightWorkoutDays();
+    }
+
+    private void highlightWorkoutDays() {
+        repository.getAllSessions(sessions -> {
+            List<EventDay> events = new ArrayList<>();
+            for (WorkoutSession session : sessions) {
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTimeInMillis(session.startTime);
+                events.add(new EventDay(calendar, R.drawable.ic_launcher_foreground)); // Or any other dot/icon
+            }
+            runOnUiThread(() -> calendarView.setEvents(events));
+        });
     }
 
     private void loadTemplates() {
@@ -97,7 +110,6 @@ public class CalendarActivity extends AppCompatActivity {
         if (isToday(selectedDateMillis)) {
             sessionStartTime = System.currentTimeMillis();
         } else {
-            // If it's another day, set it to 12:00 PM for better default than 00:00
             Calendar cal = Calendar.getInstance();
             cal.setTimeInMillis(selectedDateMillis);
             cal.set(Calendar.HOUR_OF_DAY, 12);
