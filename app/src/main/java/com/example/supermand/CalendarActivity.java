@@ -2,7 +2,11 @@ package com.example.supermand;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -10,14 +14,18 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.applandeo.materialcalendarview.CalendarView;
 import com.applandeo.materialcalendarview.EventDay;
+import com.example.supermand.data.Exercise;
+import com.example.supermand.data.ExerciseSet;
 import com.example.supermand.data.WorkoutRepository;
 import com.example.supermand.data.WorkoutSession;
 import com.example.supermand.data.WorkoutTemplate;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 public class CalendarActivity extends AppCompatActivity {
     private WorkoutRepository repository;
@@ -53,6 +61,10 @@ public class CalendarActivity extends AppCompatActivity {
             loadSessionsForDate();
         });
 
+        adapter.setOnSessionClickListener(session -> {
+            showSessionOptionsDialog(session);
+        });
+
         btnLogWorkout.setOnClickListener(v -> showTemplateSelectionDialog());
 
         loadSessionsForDate();
@@ -60,15 +72,60 @@ public class CalendarActivity extends AppCompatActivity {
         highlightWorkoutDays();
     }
 
+    private void showSessionOptionsDialog(WorkoutSession session) {
+        String[] options = {"Se detaljer / Rediger", "Slet træning"};
+        new AlertDialog.Builder(this)
+                .setTitle(session.templateName)
+                .setItems(options, (dialog, which) -> {
+                    if (which == 0) {
+                        Intent intent = new Intent(this, WorkoutSessionActivity.class);
+                        intent.putExtra("SESSION_ID", (long) session.id);
+                        startActivity(intent);
+                    } else {
+                        confirmDeleteSession(session);
+                    }
+                })
+                .show();
+    }
+
+    private void confirmDeleteSession(WorkoutSession session) {
+        new AlertDialog.Builder(this)
+                .setTitle("Slet træning")
+                .setMessage("Er du sikker på, at du vil slette denne træning?")
+                .setPositiveButton("Slet", (dialog, which) -> {
+                    repository.deleteSession(session.id);
+                    loadSessionsForDate();
+                    highlightWorkoutDays();
+                })
+                .setNegativeButton("Annuller", null)
+                .show();
+    }
+
     private void highlightWorkoutDays() {
         repository.getAllSessions(sessions -> {
             List<EventDay> events = new ArrayList<>();
+            Set<String> uniqueDays = new HashSet<>();
+
             for (WorkoutSession session : sessions) {
-                Calendar calendar = Calendar.getInstance();
-                calendar.setTimeInMillis(session.startTime);
-                events.add(new EventDay(calendar, R.drawable.ic_launcher_foreground)); // Or any other dot/icon
+                Calendar cal = Calendar.getInstance();
+                cal.setTimeInMillis(session.startTime);
+                
+                Calendar day = Calendar.getInstance();
+                day.set(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH), 0, 0, 0);
+                day.set(Calendar.MILLISECOND, 0);
+
+                String dateKey = day.get(Calendar.YEAR) + "-" + day.get(Calendar.MONTH) + "-" + day.get(Calendar.DAY_OF_MONTH);
+                
+                if (!uniqueDays.contains(dateKey)) {
+                    uniqueDays.add(dateKey);
+                    events.add(new EventDay(day, R.drawable.dot));
+                }
             }
-            runOnUiThread(() -> calendarView.setEvents(events));
+            
+            runOnUiThread(() -> {
+                calendarView.setEvents(events);
+                calendarView.setHighlightedDays(new ArrayList<>());
+            });
         });
     }
 

@@ -16,6 +16,15 @@ import java.util.Locale;
 public class SessionSummaryAdapter extends RecyclerView.Adapter<SessionSummaryAdapter.ViewHolder> {
     private List<WorkoutSession> sessions = new ArrayList<>();
     private SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+    private OnSessionClickListener listener;
+
+    public interface OnSessionClickListener {
+        void onSessionClick(WorkoutSession session);
+    }
+
+    public void setOnSessionClickListener(OnSessionClickListener listener) {
+        this.listener = listener;
+    }
 
     public void setSessions(List<WorkoutSession> sessions) {
         this.sessions = sessions;
@@ -36,6 +45,12 @@ public class SessionSummaryAdapter extends RecyclerView.Adapter<SessionSummaryAd
         holder.text1.setText(session.templateName);
         String time = timeFormat.format(new Date(session.startTime));
         holder.text2.setText("Startet kl. " + time);
+
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onSessionClick(session);
+            }
+        });
     }
 
     @Override

@@ -15,32 +15,51 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.google.android.material.button.MaterialButtonToggleGroup
-        android:id="@+id/metricToggleGroup"
-        android:layout_width="wrap_content"
+    <HorizontalScrollView
+        android:id="@+id/svToggles"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvExerciseName"
-        app:singleSelection="true"
-        app:checkedButton="@+id/btnWeight">
+        android:scrollbars="none"
+        app:layout_constraintTop_toBottomOf="@id/tvExerciseName">
 
-        <Button
-            android:id="@+id/btnWeight"
-            style="?attr/materialButtonOutlinedStyle"
+        <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/metricToggleGroup"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Vægt" />
+            app:checkedButton="@+id/btnMainMetric"
+            app:singleSelection="true">
 
-        <Button
-            android:id="@+id/btnVolume"
-            style="?attr/materialButtonOutlinedStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Volumen" />
+            <Button
+                android:id="@+id/btnMainMetric"
+                style="?attr/materialButtonOutlinedStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="min/Km" />
 
-    </com.google.android.material.button.MaterialButtonToggleGroup>
+            <Button
+                android:id="@+id/btnVolume"
+                style="?attr/materialButtonOutlinedStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Volumen" />
+
+            <Button
+                android:id="@+id/btnPace"
+                style="?attr/materialButtonOutlinedStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tempo (min/km)" />
+
+            <Button
+                android:id="@+id/btnTime"
+                style="?attr/materialButtonOutlinedStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tid (min)" />
+
+        </com.google.android.material.button.MaterialButtonToggleGroup>
+    </HorizontalScrollView>
 
     <com.github.mikephil.charting.charts.LineChart
         android:id="@+id/exerciseChart"
@@ -48,6 +67,6 @@
         android:layout_height="0dp"
         android:layout_marginTop="24dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/metricToggleGroup" />
+        app:layout_constraintTop_toBottomOf="@id/svToggles" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

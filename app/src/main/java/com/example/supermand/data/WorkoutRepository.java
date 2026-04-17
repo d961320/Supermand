@@ -77,6 +77,27 @@ public class WorkoutRepository {
         });
     }
 
+    public void getSetsForSession(int sessionId, RepositoryCallback<List<ExerciseSet>> callback) {
+        executor.execute(() -> {
+            List<ExerciseSet> sets = workoutDao.getSetsForSession(sessionId);
+            callback.onComplete(sets);
+        });
+    }
+
+    public void getSetsForExerciseInSession(int sessionId, int exerciseId, RepositoryCallback<List<ExerciseSet>> callback) {
+        executor.execute(() -> {
+            List<ExerciseSet> sets = workoutDao.getSetsForExerciseInSession(sessionId, exerciseId);
+            callback.onComplete(sets);
+        });
+    }
+
+    public void getExercisesForSession(int sessionId, RepositoryCallback<List<Exercise>> callback) {
+        executor.execute(() -> {
+            List<Exercise> exercises = workoutDao.getExercisesForSession(sessionId);
+            callback.onComplete(exercises);
+        });
+    }
+
     public void insertExercise(Exercise exercise) {
         executor.execute(() -> workoutDao.insertExercise(exercise));
     }
@@ -87,6 +108,10 @@ public class WorkoutRepository {
 
     public void deleteExercise(Exercise exercise) {
         executor.execute(() -> workoutDao.deleteExercise(exercise));
+    }
+
+    public void deleteSession(int sessionId) {
+        executor.execute(() -> workoutDao.deleteSession(sessionId));
     }
 
     public void startNewSession(String templateName, RepositoryCallback<Long> callback) {

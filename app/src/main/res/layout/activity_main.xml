@@ -22,6 +22,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="32dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
@@ -35,7 +36,7 @@
                     android:id="@+id/tvTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Supermand Training"
+                    android:text="Superman Training"
                     android:textSize="28sp"
                     android:textStyle="bold" />
             </LinearLayout>
@@ -44,7 +45,6 @@
                 android:id="@+id/llButtons"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
                 android:orientation="vertical">
 
                 <Button
@@ -165,8 +165,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginVertical="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"
                 android:text="Administrer øvelser" />
+
+            <!-- Afstandsholder i bunden -->
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="80dp" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 

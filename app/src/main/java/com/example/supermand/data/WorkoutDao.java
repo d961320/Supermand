@@ -35,6 +35,9 @@ public interface WorkoutDao {
     @Query("UPDATE workout_sessions SET endTime = :endTime WHERE id = :sessionId")
     void endSession(int sessionId, long endTime);
 
+    @Query("DELETE FROM workout_sessions WHERE id = :sessionId")
+    void deleteSession(int sessionId);
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     long insertSet(ExerciseSet set);
 
@@ -43,6 +46,16 @@ public interface WorkoutDao {
 
     @Query("DELETE FROM exercise_sets WHERE sessionId = :sessionId AND exerciseId = :exerciseId AND setOrder = :setOrder")
     void deleteSet(int sessionId, int exerciseId, int setOrder);
+
+    @Query("SELECT * FROM exercise_sets WHERE sessionId = :sessionId")
+    List<ExerciseSet> getSetsForSession(int sessionId);
+
+    @Query("SELECT * FROM exercise_sets WHERE sessionId = :sessionId AND exerciseId = :exerciseId ORDER BY setOrder ASC")
+    List<ExerciseSet> getSetsForExerciseInSession(int sessionId, int exerciseId);
+
+    @Transaction
+    @Query("SELECT * FROM exercises WHERE id IN (SELECT DISTINCT exerciseId FROM exercise_sets WHERE sessionId = :sessionId)")
+    List<Exercise> getExercisesForSession(int sessionId);
 
     @Query("SELECT * FROM workout_sessions ORDER BY startTime DESC")
     List<WorkoutSession> getAllSessions();
@@ -73,10 +86,13 @@ public interface WorkoutDao {
     List<ExerciseSet> getLastSetsForExercise(int exerciseId);
 
     @Transaction
-    @Query("SELECT ws.startTime, es.weight, es.reps, (es.weight * es.reps) as volume " +
+    @Query("SELECT ws.startTime, SUM(es.weight) as weight, SUM(es.reps) as reps, " +
+           "CASE WHEN e.type = 'DISTANCE_TIME' THEN (SUM(es.weight) * (SUM(es.reps) / 60.0)) ELSE SUM(es.weight * es.reps) END as volume " +
            "FROM exercise_sets es " +
            "JOIN workout_sessions ws ON es.sessionId = ws.id " +
+           "JOIN exercises e ON es.exerciseId = e.id " +
            "WHERE es.exerciseId = :exerciseId " +
+           "GROUP BY es.sessionId " +
            "ORDER BY ws.startTime ASC")
     List<ExerciseProgress> getExerciseProgress(int exerciseId);
 }

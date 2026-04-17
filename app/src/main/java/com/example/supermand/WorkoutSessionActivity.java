@@ -47,14 +47,15 @@ public class WorkoutSessionActivity extends AppCompatActivity {
 
         loadAllExercises();
 
-        if (templateId != -1) {
-            repository.getExercisesForTemplate(templateId, exercises -> {
-                runOnUiThread(() -> adapter.setExercises(exercises));
-            });
-        } else if (singleExerciseId != -1) {
-            repository.getExerciseById(singleExerciseId, exercise -> {
-                if (exercise != null) {
-                    runOnUiThread(() -> adapter.setExercises(new ArrayList<>(Collections.singletonList(exercise))));
+        if (sessionId != -1) {
+            // Loading an existing session
+            repository.getExercisesForSession((int) sessionId, exercises -> {
+                if (exercises != null && !exercises.isEmpty()) {
+                    runOnUiThread(() -> adapter.setExercises(exercises));
+                } else if (templateId != -1) {
+                    loadExercisesForTemplate(templateId);
+                } else if (singleExerciseId != -1) {
+                    loadSingleExercise(singleExerciseId);
                 }
             });
         }
@@ -65,6 +66,20 @@ public class WorkoutSessionActivity extends AppCompatActivity {
         btnFinish.setOnClickListener(v -> {
             repository.endSession((int) sessionId);
             finish();
+        });
+    }
+    
+    private void loadExercisesForTemplate(int templateId) {
+        repository.getExercisesForTemplate(templateId, exercises -> {
+            runOnUiThread(() -> adapter.setExercises(exercises));
+        });
+    }
+    
+    private void loadSingleExercise(int exerciseId) {
+        repository.getExerciseById(exerciseId, exercise -> {
+            if (exercise != null) {
+                runOnUiThread(() -> adapter.setExercises(new ArrayList<>(Collections.singletonList(exercise))));
+            }
         });
     }
 
@@ -172,8 +187,8 @@ public class WorkoutSessionActivity extends AppCompatActivity {
                     View headersRow = inner.getChildAt(1);
                     if (headersRow instanceof LinearLayout) {
                         LinearLayout hRow = (LinearLayout) headersRow;
-                        TextView tvWeightLabel = (TextView) hRow.getChildAt(1); // Index 1 is weight/km (Previous column removed from UI)
-                        TextView tvRepsLabel = (TextView) hRow.getChildAt(2);   // Index 2 is reps/time
+                        TextView tvWeightLabel = (TextView) hRow.getChildAt(1);
+                        TextView tvRepsLabel = (TextView) hRow.getChildAt(2);
                         if ("DISTANCE_TIME".equals(exercise.type)) {
                             tvWeightLabel.setText("km");
                             tvRepsLabel.setText("Tid");
@@ -184,18 +199,60 @@ public class WorkoutSessionActivity extends AppCompatActivity {
                     }
                 }
 
-                addSetRow(exercise);
+                // Load existing sets for this session and exercise
+                repository.getSetsForExerciseInSession((int) sessionId, exercise.id, sets -> {
+                    runOnUiThread(() -> {
+                        if (sets != null && !sets.isEmpty()) {
+                            for (ExerciseSet set : sets) {
+                                addExistingSetRow(exercise, set);
+                            }
+                        } else {
+                            addSetRow(exercise);
+                        }
+                    });
+                });
 
                 btnAddSet.setOnClickListener(v -> addSetRow(exercise));
             }
 
+            private void addExistingSetRow(Exercise exercise, ExerciseSet set) {
+                setCounter++;
+                View row = createSetRow(exercise);
+                TextView tvSetNum = row.findViewById(R.id.tvSetNumber);
+                tvSetNum.setText(String.valueOf(set.setOrder));
+                if (set.setOrder > setCounter) setCounter = set.setOrder;
+
+                EditText etWeight = row.findViewById(R.id.etWeight);
+                EditText etReps = row.findViewById(R.id.etReps);
+                EditText etH = row.findViewById(R.id.etHours);
+                EditText etM = row.findViewById(R.id.etMinutes);
+                EditText etS = row.findViewById(R.id.etSeconds);
+
+                etWeight.setText(String.valueOf(set.weight));
+                if ("DISTANCE_TIME".equals(exercise.type)) {
+                    int h = set.reps / 3600;
+                    int m = (set.reps % 3600) / 60;
+                    int s = set.reps % 60;
+                    if (h > 0) etH.setText(String.valueOf(h));
+                    if (m > 0) etM.setText(String.valueOf(m));
+                    if (s > 0) etS.setText(String.valueOf(s));
+                } else {
+                    etReps.setText(String.valueOf(set.reps));
+                }
+
+                setsContainer.addView(row);
+            }
+
             private void addSetRow(Exercise exercise) {
                 setCounter++;
-                View row = LayoutInflater.from(WorkoutSessionActivity.this).inflate(R.layout.item_set_row, setsContainer, false);
+                View row = createSetRow(exercise);
                 TextView tvSetNum = row.findViewById(R.id.tvSetNumber);
                 tvSetNum.setText(String.valueOf(setCounter));
-                
-                // Hide Previous column
+                setsContainer.addView(row);
+            }
+
+            private View createSetRow(Exercise exercise) {
+                View row = LayoutInflater.from(WorkoutSessionActivity.this).inflate(R.layout.item_set_row, setsContainer, false);
                 row.findViewById(R.id.tvPrevious).setVisibility(View.GONE);
                 
                 EditText etWeight = row.findViewById(R.id.etWeight);
@@ -223,13 +280,12 @@ public class WorkoutSessionActivity extends AppCompatActivity {
                 etS.setOnFocusChangeListener(saveListener);
 
                 row.findViewById(R.id.btnDeleteSet).setOnClickListener(v -> {
-                    int order = Integer.parseInt(tvSetNum.getText().toString());
+                    int order = Integer.parseInt(((TextView)row.findViewById(R.id.tvSetNumber)).getText().toString());
                     repository.deleteSet((int) sessionId, exercise.id, order);
                     setsContainer.removeView(row);
                     reorderSets();
                 });
-
-                setsContainer.addView(row);
+                return row;
             }
 
             private void reorderSets() {

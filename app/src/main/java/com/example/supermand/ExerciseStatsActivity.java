@@ -1,12 +1,16 @@
 package com.example.supermand;
 
+import android.graphics.Color;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import com.example.supermand.data.ExerciseProgress;
 import com.example.supermand.data.WorkoutRepository;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
@@ -44,7 +48,7 @@ public class ExerciseStatsActivity extends AppCompatActivity {
 
         metricToggleGroup.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
             if (isChecked) {
-                updateChart(checkedId == R.id.btnWeight);
+                updateChart(checkedId);
             }
         });
 
@@ -54,9 +58,19 @@ public class ExerciseStatsActivity extends AppCompatActivity {
     private void setupChart() {
         chart.getDescription().setEnabled(false);
         chart.getLegend().setEnabled(true);
+        int textColor = getThemeColor(android.R.attr.textColorPrimary);
+        chart.getLegend().setTextColor(textColor);
+
         XAxis xAxis = chart.getXAxis();
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         xAxis.setGranularity(1f);
+        xAxis.setTextColor(textColor);
+        xAxis.setGridColor(getThemeColor(android.R.attr.textColorSecondary));
+
+        YAxis leftAxis = chart.getAxisLeft();
+        leftAxis.setTextColor(textColor);
+        leftAxis.setGridColor(getThemeColor(android.R.attr.textColorSecondary));
+
         chart.getAxisRight().setEnabled(false);
         
         xAxis.setValueFormatter(new ValueFormatter() {
@@ -72,30 +86,89 @@ public class ExerciseStatsActivity extends AppCompatActivity {
         });
     }
 
+    private int getThemeColor(int attr) {
+        android.util.TypedValue typedValue = new android.util.TypedValue();
+        if (getTheme().resolveAttribute(attr, typedValue, true)) {
+            return typedValue.data;
+        }
+        return Color.GRAY;
+    }
+
     private void loadProgress() {
         repository.getExerciseProgress(exerciseId, progress -> {
             this.progressData = progress;
-            runOnUiThread(() -> updateChart(metricToggleGroup.getCheckedButtonId() == R.id.btnWeight));
+            runOnUiThread(() -> {
+                boolean hasTime = false;
+                for (ExerciseProgress p : progressData) {
+                    if (p.reps > 0) {
+                        hasTime = true;
+                        break;
+                    }
+                }
+                
+                if (hasTime) {
+                    findViewById(R.id.btnPace).setVisibility(View.VISIBLE);
+                    findViewById(R.id.btnTime).setVisibility(View.VISIBLE);
+                    // For cardio exercises like "Løb", let's default to Pace if available
+                    Button btnPace = findViewById(R.id.btnPace);
+                    metricToggleGroup.check(R.id.btnPace);
+                } else {
+                    findViewById(R.id.btnPace).setVisibility(View.GONE);
+                    findViewById(R.id.btnTime).setVisibility(View.GONE);
+                    metricToggleGroup.check(R.id.btnMainMetric);
+                }
+                
+                updateChart(metricToggleGroup.getCheckedButtonId());
+            });
         });
     }
 
-    private void updateChart(boolean showWeight) {
+    private void updateChart(int checkedId) {
         if (progressData.isEmpty()) return;
 
         List<Entry> entries = new ArrayList<>();
+        String label = "";
+
         for (int i = 0; i < progressData.size(); i++) {
             ExerciseProgress p = progressData.get(i);
-            float val = showWeight ? (float) p.weight : (float) p.volume;
+            float val = 0;
+
+            if (checkedId == R.id.btnMainMetric) {
+                val = (float) p.weight;
+                label = "Km / Vægt";
+            } else if (checkedId == R.id.btnVolume) {
+                val = (float) p.volume;
+                label = "Volumen";
+            } else if (checkedId == R.id.btnPace) {
+                if (p.weight > 0) {
+                    val = (float) ((p.reps / 60.0) / p.weight);
+                }
+                label = "Tempo (min/km)";
+            } else if (checkedId == R.id.btnTime) {
+                val = (float) (p.reps / 60.0);
+                label = "Tid (min)";
+            }
             entries.add(new Entry(i, val));
         }
 
-        String label = showWeight ? "Vægt (kg)" : "Volumen (kg * reps)";
         LineDataSet dataSet = new LineDataSet(entries, label);
         dataSet.setColor(getResources().getColor(R.color.purple_500, getTheme()));
         dataSet.setCircleColor(getResources().getColor(R.color.purple_700, getTheme()));
         dataSet.setLineWidth(2f);
         dataSet.setCircleRadius(4f);
         dataSet.setDrawValues(true);
+        dataSet.setValueTextColor(getThemeColor(android.R.attr.textColorPrimary));
+        
+        if (checkedId == R.id.btnPace) {
+            dataSet.setValueFormatter(new ValueFormatter() {
+                @Override
+                public String getFormattedValue(float value) {
+                    int minutes = (int) value;
+                    int seconds = (int) ((value - minutes) * 60);
+                    return String.format(Locale.getDefault(), "%d:%02d", minutes, seconds);
+                }
+            });
+        }
 
         chart.setData(new LineData(dataSet));
         chart.invalidate();

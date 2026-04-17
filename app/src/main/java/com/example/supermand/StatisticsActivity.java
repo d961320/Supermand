@@ -11,6 +11,7 @@ import com.example.supermand.data.WorkoutSession;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
@@ -78,14 +79,24 @@ public class StatisticsActivity extends AppCompatActivity {
     }
 
     private void setupMainCharts() {
+        int textColor = getThemeColor(android.R.attr.textColorPrimary);
+        int gridColor = getThemeColor(android.R.attr.textColorSecondary);
+
         // BarChart
         barChart.getDescription().setEnabled(false);
         barChart.getLegend().setEnabled(false);
         XAxis xAxisBar = barChart.getXAxis();
         xAxisBar.setPosition(XAxis.XAxisPosition.BOTTOM);
         xAxisBar.setGranularity(1f);
+        xAxisBar.setTextColor(textColor);
+        xAxisBar.setGridColor(gridColor);
+
+        YAxis leftAxisBar = barChart.getAxisLeft();
+        leftAxisBar.setTextColor(textColor);
+        leftAxisBar.setGridColor(gridColor);
+        leftAxisBar.setAxisMinimum(0f);
+
         barChart.getAxisRight().setEnabled(false);
-        barChart.getAxisLeft().setAxisMinimum(0f);
 
         // LineChart
         mainLineChart.getDescription().setEnabled(false);
@@ -93,8 +104,21 @@ public class StatisticsActivity extends AppCompatActivity {
         XAxis xAxisLine = mainLineChart.getXAxis();
         xAxisLine.setPosition(XAxis.XAxisPosition.BOTTOM);
         xAxisLine.setGranularity(1f);
+        xAxisLine.setTextColor(textColor);
+        xAxisLine.setGridColor(gridColor);
+
+        YAxis leftAxisLine = mainLineChart.getAxisLeft();
+        leftAxisLine.setTextColor(textColor);
+        leftAxisLine.setGridColor(gridColor);
+        leftAxisLine.setAxisMinimum(0f);
+
         mainLineChart.getAxisRight().setEnabled(false);
-        mainLineChart.getAxisLeft().setAxisMinimum(0f);
+    }
+
+    private int getThemeColor(int attr) {
+        android.util.TypedValue typedValue = new android.util.TypedValue();
+        getTheme().resolveAttribute(attr, typedValue, true);
+        return typedValue.data;
     }
 
     private void loadData() {
@@ -158,6 +182,8 @@ public class StatisticsActivity extends AppCompatActivity {
             }
         };
 
+        int textColor = getThemeColor(android.R.attr.textColorPrimary);
+
         // Update BarChart
         List<BarEntry> barEntries = new ArrayList<>();
         List<Entry> lineEntries = new ArrayList<>();
@@ -168,6 +194,7 @@ public class StatisticsActivity extends AppCompatActivity {
 
         BarDataSet barSet = new BarDataSet(barEntries, "Træninger");
         barSet.setColor(0xFF6200EE);
+        barSet.setValueTextColor(textColor);
         barChart.getXAxis().setValueFormatter(dateFormatter);
         barChart.setData(new BarData(barSet));
         barChart.invalidate();
@@ -179,6 +206,7 @@ public class StatisticsActivity extends AppCompatActivity {
         lineSet.setLineWidth(2f);
         lineSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
         lineSet.setDrawFilled(true);
+        lineSet.setValueTextColor(textColor);
         mainLineChart.getXAxis().setValueFormatter(dateFormatter);
         mainLineChart.setData(new LineData(lineSet));
         mainLineChart.invalidate();
