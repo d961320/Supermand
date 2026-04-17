@@ -110,8 +110,11 @@ public class WorkoutRepository {
         executor.execute(() -> workoutDao.deleteExercise(exercise));
     }
 
-    public void deleteSession(int sessionId) {
-        executor.execute(() -> workoutDao.deleteSession(sessionId));
+    public void deleteSession(int sessionId, Runnable onComplete) {
+        executor.execute(() -> {
+            workoutDao.deleteSession(sessionId);
+            if (onComplete != null) onComplete.run();
+        });
     }
 
     public void startNewSession(String templateName, RepositoryCallback<Long> callback) {

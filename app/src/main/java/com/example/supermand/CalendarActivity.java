@@ -67,8 +67,14 @@ public class CalendarActivity extends AppCompatActivity {
 
         btnLogWorkout.setOnClickListener(v -> showTemplateSelectionDialog());
 
-        loadSessionsForDate();
         loadTemplates();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Refresh data when returning to this activity
+        loadSessionsForDate();
         highlightWorkoutDays();
     }
 
@@ -93,9 +99,12 @@ public class CalendarActivity extends AppCompatActivity {
                 .setTitle("Slet træning")
                 .setMessage("Er du sikker på, at du vil slette denne træning?")
                 .setPositiveButton("Slet", (dialog, which) -> {
-                    repository.deleteSession(session.id);
-                    loadSessionsForDate();
-                    highlightWorkoutDays();
+                    repository.deleteSession(session.id, () -> {
+                        runOnUiThread(() -> {
+                            loadSessionsForDate();
+                            highlightWorkoutDays();
+                        });
+                    });
                 })
                 .setNegativeButton("Annuller", null)
                 .show();
